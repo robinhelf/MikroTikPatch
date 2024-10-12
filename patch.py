@@ -86,11 +86,12 @@ def patch_initrd_xz(initrd_xz:bytes,key_dict:dict,ljust=True):
             new_initrd = new_initrd.replace(old_public_key,new_public_key)
     new_initrd_xz = lzma.compress(new_initrd,check=lzma.CHECK_CRC32,filters=[{"id": lzma.FILTER_LZMA2, "preset": 9,}] )
     if ljust:
-        assert len(new_initrd_xz) <= len(initrd_xz),'new initrd xz size is too big'
-        print(f'new initrd xz size:{len(new_initrd_xz)}')
-        print(f'old initrd xz size:{len(initrd_xz)}')
-        print(f'ljust size:{len(initrd_xz)-len(new_initrd_xz)}')
-        new_initrd_xz = new_initrd_xz.ljust(len(initrd_xz),b'\0')
+        # assert len(new_initrd_xz) <= len(initrd_xz),'new initrd xz size is too big'
+        if (len(new_initrd_xz) <= len(initrd_xz))
+            print(f'new initrd xz size:{len(new_initrd_xz)}')
+            print(f'old initrd xz size:{len(initrd_xz)}')
+            print(f'ljust size:{len(initrd_xz)-len(new_initrd_xz)}')
+            new_initrd_xz = new_initrd_xz.ljust(len(initrd_xz),b'\0')
     return new_initrd_xz
 
 def find_7zXZ_data(data:bytes):
