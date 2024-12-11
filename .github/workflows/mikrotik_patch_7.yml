@@ -44,7 +44,7 @@ jobs:
       matrix:
         # arch: [arm,x86,mmips,arm64,smips]
         # channel: [stable,testing]
-        arch: [arm,x86,mmips,arm64,smips]
+        arch: [arm,x86,mmips,arm64]
         channel: [stable]
     env:
       TZ: 'Asia/Shanghai'
