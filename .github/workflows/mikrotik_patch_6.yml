@@ -1,4 +1,4 @@
-name: Patch Mikrotik RouterOS 6.x
+name: Patch Mikrotik RouterOS 6.x x86
 
 on:
   # push:
