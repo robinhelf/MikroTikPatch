@@ -36,13 +36,14 @@ jobs:
       - name: Set build time
         id: set_buildtime
         run: echo "BUILD_TIME=$(date +'%s')" >> $GITHUB_OUTPUT
-
+  
   Patch_RouterOS:
+    continue-on-error: true
     needs: Set_BuildTime
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        arch: [arm,x86,mmips,arm64,smips,mipsle]
+        arch: [arm,x86,mmips,arm64,smips,mipsbe]
         channel: [stable,testing]
     env:
       TZ: 'Asia/Shanghai'
@@ -94,8 +95,8 @@ jobs:
         elif [ "${{ matrix.arch }}" == "smips" ]; then
           ARCH='-smips'
           echo "ARCH=$ARCH" >> $GITHUB_ENV
-        elif [ "${{ matrix.arch }}" == "mipsle" ]; then
-          ARCH='-mipsle'
+        elif [ "${{ matrix.arch }}" == "mipsbe" ]; then
+          ARCH='-mipsbe'
           echo "ARCH=$ARCH" >> $GITHUB_ENV
         fi
         sudo apt-get update > /dev/null
@@ -270,13 +271,13 @@ jobs:
       run: sudo wget -nv -O refind-bin-0.14.2.zip https://nchc.dl.sourceforge.net/project/refind/0.14.2/refind-bin-0.14.2.zip
 
     - name: Get mikrotik-${{ env.LATEST_VERSION }}${{ env.ARCH }}.npk
-      if: steps.get_latest.outputs.has_new_version == 'true' && (matrix.arch == 'arm' || matrix.arch == 'mmips' || matrix.arch == 'smips'|| matrix.arch == 'mipsle')
+      if: steps.get_latest.outputs.has_new_version == 'true' && (matrix.arch == 'arm' || matrix.arch == 'mmips' || matrix.arch == 'smips'|| matrix.arch == 'mipsbe')
       run: |
         sudo wget -nv -O routeros-${{ env.LATEST_VERSION }}${{ env.ARCH }}.npk https://download.mikrotik.com/routeros/${{ env.LATEST_VERSION }}/routeros-${{ env.LATEST_VERSION }}${{ env.ARCH }}.npk
         sudo wget -nv -O all_packages-${{ env.LATEST_VERSION }}${{ env.ARCH }}.zip https://download.mikrotik.com/routeros/${{ env.LATEST_VERSION }}/all_packages${{ env.ARCH }}-${{ env.LATEST_VERSION }}.zip
 
     - name: Patch mikrotik-${{ env.LATEST_VERSION }}${{ env.ARCH }}.npk
-      if: steps.get_latest.outputs.has_new_version == 'true' && (matrix.arch == 'arm' || matrix.arch == 'mmips' || matrix.arch == 'smips'|| matrix.arch == 'mipsle')
+      if: steps.get_latest.outputs.has_new_version == 'true' && (matrix.arch == 'arm' || matrix.arch == 'mmips' || matrix.arch == 'smips'|| matrix.arch == 'mipsbe')
       run: |
         sudo mkdir ./all_packages
         sudo unzip all_packages-${{ env.LATEST_VERSION }}${{ env.ARCH }}.zip  -d ./all_packages
