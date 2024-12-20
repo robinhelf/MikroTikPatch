@@ -26,6 +26,8 @@ env:
   CUSTOM_RENEW_URL: ${{ secrets.CUSTOM_RENEW_URL }}
   MIKRO_CLOUD_URL: ${{ secrets.MIKRO_CLOUD_URL }}
   CUSTOM_CLOUD_URL: ${{ secrets.CUSTOM_CLOUD_URL }}
+  API_ENDPOINT: ${{ secrets.API_ENDPOINT }}
+  API_KEY: ${{ secrets.API_KEY }}
 
 jobs:
   Set_BuildTime:
@@ -78,6 +80,8 @@ jobs:
         BUILD_TIME=${{ needs.Set_BuildTime.outputs.BUILD_TIME }}
         echo Build Time:$BUILD_TIME
         wget -nv -O CHANGELOG https://${{ env.MIKRO_UPGRADE_URL }}/routeros/$LATEST_VERSION/CHANGELOG
+        sudo pip install requests
+        sudo -E python3 translate.py CHANGELOG
         cat CHANGELOG
         echo "LATEST_VERSION=${LATEST_VERSION}" >> $GITHUB_ENV
         echo "BUILD_TIME=${BUILD_TIME}" >> $GITHUB_ENV
