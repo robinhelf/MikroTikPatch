@@ -65,6 +65,7 @@ jobs:
         echo $(uname -a)
         LATEST_VERSION=$(wget -nv -O - https://${{ env.MIKRO_UPGRADE_URL }}/routeros/NEWESTa7.${{ matrix.channel }} | cut -d ' ' -f1)
         echo Latest Version:$LATEST_VERSION
+        #LATEST_VERSION=7.15.3
         if [ "${{ github.event_name }}" == "schedule" ]; then
           _LATEST_VERSION=$(wget -nv -O - https://${{ env.CUSTOM_UPGRADE_URL }}/routeros/NEWESTa7.${{ matrix.channel }} | cut -d ' ' -f1)
           if [ "$_LATEST_VERSION" == "$LATEST_VERSION" ]; then
@@ -100,6 +101,7 @@ jobs:
           echo "ARCH=$ARCH" >> $GITHUB_ENV
         fi
         sudo apt-get update > /dev/null
+        sudo apt install squashfs-tools -y > /dev/null
 
     - name: Cache Squashfs
       if: steps.get_latest.outputs.has_new_version == 'true'
@@ -128,6 +130,9 @@ jobs:
         elif [ "${{ matrix.arch }}" == "arm" ]; then
           sudo cp busybox/busybox_arm ./option-root/bin/busybox
           sudo chmod +x ./option-root/bin/busybox
+        elif [ "${{ matrix.arch }}" == "mmips" ]; then
+          sudo cp busybox/busybox_mmips ./option-root/bin/busybox
+          sudo chmod +x ./option-root/bin/busybox
         else
           exit 0
         fi
@@ -144,6 +149,8 @@ jobs:
           sudo wget -O cpython.tar.gz -nv https://github.com/indygreg/python-build-standalone/releases/download/20241016/cpython-3.11.10+20241016-aarch64-unknown-linux-gnu-install_only_stripped.tar.gz
         elif [ "${{ matrix.arch }}" == "arm" ]; then
           sudo wget -O cpython.tar.gz -nv https://github.com/indygreg/python-build-standalone/releases/download/20241016/cpython-3.11.10+20241016-armv7-unknown-linux-gnueabi-install_only_stripped.tar.gz
+        else
+           exit 0 
         fi
         sudo tar -xf cpython.tar.gz
         sudo rm cpython.tar.gz
@@ -291,7 +298,9 @@ jobs:
           sudo -E python3 npk.py create ./all_packages/gps-$LATEST_VERSION$ARCH.npk ./python3-$LATEST_VERSION$ARCH.npk python3 ./python3.sfs -desc="python 3.11.9"
           sudo cp ./option-$LATEST_VERSION$ARCH.npk ./all_packages/
           sudo cp ./python3-$LATEST_VERSION$ARCH.npk ./all_packages/
+        elif [ "${{ matrix.arch }}" == "mmips" ]; then
         fi
+
         sudo -E python3 patch.py npk routeros-${{ env.LATEST_VERSION }}${{ env.ARCH }}.npk
         sudo zip routeros-${{ env.LATEST_VERSION }}${{ env.ARCH }}.zip routeros-${{ env.LATEST_VERSION }}${{ env.ARCH }}.npk
         sudo cp routeros-${{ env.LATEST_VERSION }}${{ env.ARCH }}.npk ./all_packages/
