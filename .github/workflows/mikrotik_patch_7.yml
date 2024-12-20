@@ -2,8 +2,8 @@ name: Patch Mikrotik RouterOS 7.x
 on:
   # push:
   #   branches: [ "main" ]
-  schedule:
-    - cron: "0 0 * * *"
+  # schedule:
+  #   - cron: "0 0 * * *"
   workflow_dispatch:
     inputs:
       latest:
@@ -11,11 +11,28 @@ on:
         type: boolean
         default: true
       
-      custom:
+      all_arch:
+        description: 'Patch All Arch'
+        type: boolean
+        default: true
+      
+      custom_version:
         description: 'Patch Custom Version'
         type: string
         default: ''
         required: false
+
+      custom_channel:
+        description: 'Patch Custom Channel'
+        type: choice
+        options: [ 'stable', 'testing' ]
+        default: 'stable'
+
+      custom_arch:
+        description: 'Patch Custom Arch'
+        type: choice
+        options: [ 'x86', 'arm', 'arm64', 'mmips', 'smips', 'mipsbe' ]
+        default: 'x86'
 
 permissions:
   contents: write
@@ -45,10 +62,25 @@ jobs:
     runs-on: ubuntu-22.04
     outputs:
       BUILD_TIME: ${{ steps.set_buildtime.outputs.BUILD_TIME }}
+      CHANNEL_MATRIX: ${{ steps.set_matrix.outputs.channel_matrix }}
+      ARCH_MATRIX: ${{ steps.set_matrix.outputs.arch_matrix }}
     steps:
       - name: Set build time
         id: set_buildtime
         run: echo "BUILD_TIME=$(date +'%s')" >> $GITHUB_OUTPUT
+      - name: Set up matrix
+        id: set_matrix
+        run: |
+          if [ "${{ inputs.latest }}" == "true" ]; then
+            echo "::set-output name=channel_matrix::[\"stable\", \"testing\"]"
+          else
+            echo "::set-output name=channel_matrix::[\"${{ inputs.custom_channel }}\"]"
+          fi
+          if [ "${{ inputs.all_arch }}" == "true" ]; then
+            echo "::set-output name=arch_matrix::[\"x86\", \"arm\", \"arm64\", \"mmips\", \"smips\", \"mipsbe\"]"
+          else
+            echo "::set-output name=arch_matrix::[\"${{ inputs.custom_channel }}\"]"
+          fi
 
   PreparePatch:
     runs-on: ubuntu-22.04
@@ -56,7 +88,7 @@ jobs:
 
     strategy:
       matrix:
-        channel: [stable,testing]
+        channel: ${{ fromJson(needs.Set_Runner.outputs.CHANNEL_MATRIX) }}
     
     steps:
       - name: Checkout repository
@@ -74,7 +106,7 @@ jobs:
             LATEST_VERSION=$(wget -nv -O - https://upgrade.mikrotik.com/routeros/NEWESTa7.${{ matrix.channel }} | cut -d ' ' -f1)
             _LATEST_VERSION=$(wget -nv -O - https://${{ env.CUSTOM_UPGRADE_URL }}/routeros/NEWESTa7.${{ matrix.channel }} | cut -d ' ' -f1) || true
           else
-            LATEST_VERSION=${{ inputs.custom }}
+            LATEST_VERSION=${{ inputs.custom_version }}
           fi
           if [ -z "$LATEST_VERSION" ]; then
             exit 1
@@ -127,13 +159,13 @@ jobs:
             ./version_info-${{ matrix.channel }}
 
   RunPatch:
-    needs: PreparePatch
+    needs: [Set_Runner,PreparePatch]
     runs-on: ubuntu-latest
     continue-on-error: true
     strategy:
       matrix:
-        arch: [arm,x86,mmips,arm64,smips,mipsbe]
-        channel: [stable,testing]
+        arch: ${{ fromJson(needs.Set_Runner.outputs.ARCH_MATRIX) }}
+        channel: ${{ fromJson(needs.Set_Runner.outputs.CHANNEL_MATRIX) }}
     env:
       TZ: 'Asia/Shanghai'
       LATEST_VERSION: ""
