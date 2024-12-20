@@ -39,6 +39,7 @@ jobs:
         run: echo "BUILD_TIME=$(date +'%s')" >> $GITHUB_OUTPUT
 
   Patch_RouterOS:
+    continue-on-error: true
     needs: Set_BuildTime
     runs-on: ubuntu-22.04
     strategy:
