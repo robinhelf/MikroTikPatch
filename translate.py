@@ -52,8 +52,7 @@ def main(input_file, output_file):
     if translated_text:
         # 将翻译后的文本和原文写入输出文件
         with open(output_file, 'w', encoding='utf-8') as f:
-            f.write("This is a Patched Version of routerOS.For Educational Purpose Only\n\n Refer to https://github.com/fujr/MikroTikPatch\n\n")
-            f.write(translated_text + '\n\n' + english_text)
+            f.write("This is a Patched Version of routerOS.For Educational Purpose Only\n\n Refer to https://github.com/fujr/MikroTikPatch\n\n" + translated_text + '\n\n' + english_text)
 
 if __name__ == "__main__":
     input_file = sys.argv[1]
