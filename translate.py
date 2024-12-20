@@ -46,7 +46,7 @@ def main(input_file, output_file):
     translated_text = ''
     for i in range(0, len(english_text.split('\n')), 20):
         text = '\n'.join(english_text.split('\n')[i:i+20])
-        translated_text += translate_text(text) + '\n\n'
+        translated_text += translate_text(text) + '\n'
     
 
     if translated_text:
