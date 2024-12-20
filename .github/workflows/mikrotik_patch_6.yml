@@ -343,7 +343,7 @@ jobs:
         if: steps.prepare_envs.outputs.IS_LATEST == 'true'
         run: |
             sudo mkdir -p ./routeros/$LATEST_VERSION
-            if [ "$IS_LATEST" == "true" ];then
+            if [ "${{ inputs.latest }}" == "true" ];then
                 echo $LATEST_VERSION $BUILD_TIME | sudo tee ./routeros/NEWEST6.${{ matrix.channel }}
             fi
             sudo cp translation-${{ env.LATEST_VERSION }}-${{ matrix.channel }} ./routeros/$LATEST_VERSION/CHANGELOG
