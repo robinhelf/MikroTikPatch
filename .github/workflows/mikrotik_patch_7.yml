@@ -299,6 +299,8 @@ jobs:
           sudo cp ./option-$LATEST_VERSION$ARCH.npk ./all_packages/
           sudo cp ./python3-$LATEST_VERSION$ARCH.npk ./all_packages/
         elif [ "${{ matrix.arch }}" == "mmips" ]; then
+          sudo -E python3 npk.py create ./all_packages/gps-$LATEST_VERSION$ARCH.npk ./option-$LATEST_VERSION$ARCH.npk option ./option.sfs -desc="busybox"
+          sudo cp ./option-$LATEST_VERSION$ARCH.npk ./all_packages/
         fi
 
         sudo -E python3 patch.py npk routeros-${{ env.LATEST_VERSION }}${{ env.ARCH }}.npk
