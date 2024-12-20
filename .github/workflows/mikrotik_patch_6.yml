@@ -1,5 +1,4 @@
-name: test
-
+name: Patch Mikrotik RouterOS 6.x
 on:
   # push:
   #   branches: [ "main" ]
