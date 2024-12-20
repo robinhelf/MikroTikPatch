@@ -62,8 +62,8 @@ jobs:
     runs-on: ubuntu-22.04
     outputs:
       BUILD_TIME: ${{ steps.set_buildtime.outputs.BUILD_TIME }}
-      CHANNEL_MATRIX: ${{ steps.set_matrix.outputs.channel_matrix }}
-      ARCH_MATRIX: ${{ steps.set_matrix.outputs.arch_matrix }}
+      CHANNEL_MATRIX: ${{ steps.set_matrix.outputs.CHANNEL_MATRIX }}
+      ARCH_MATRIX: ${{ steps.set_matrix.outputs.ARCH_MATRIX }}
     steps:
       - name: Set build time
         id: set_buildtime
@@ -72,14 +72,14 @@ jobs:
         id: set_matrix
         run: |
           if [ "${{ inputs.latest }}" == "true" ]; then
-            echo "::set-output name=channel_matrix::[\"stable\", \"testing\"]"
+            echo "CHANNEL_MATRIX=[\"stable\", \"testing\"]" >> $GITHUB_OUTPUT
           else
-            echo "::set-output name=channel_matrix::[\"${{ inputs.custom_channel }}\"]"
+            echo "CHANNEL_MATRIX=[\"${{ inputs.custom_channel }}\"]" >> $GITHUB_OUTPUT
           fi
           if [ "${{ inputs.all_arch }}" == "true" ]; then
-            echo "::set-output name=arch_matrix::[\"x86\", \"arm\", \"arm64\", \"mmips\", \"smips\", \"mipsbe\"]"
+            echo "ARCH_MATRIX=[\"x86\", \"arm\", \"arm64\", \"mmips\", \"smips\", \"mipsbe\"]" >> $GITHUB_OUTPUT
           else
-            echo "::set-output name=arch_matrix::[\"${{ inputs.custom_channel }}\"]"
+            echo "ARCH_MATRIX=[\"${{ inputs.custom_channel }}\"]" >> $GITHUB_OUTPUT
           fi
 
   PreparePatch:
