@@ -164,7 +164,7 @@ jobs:
         sudo zip ../all_packages$ARCH-$LATEST_VERSION.zip *.npk
 
     - name: Create install-image-${{ env.LATEST_VERSION }}.img
-      if: steps.get_latest.outputs.has_new_version == 'true'
+      if: steps.get_latest.outputs.has_new_version == 'true' && matrix.arch != 'x86'
       run: |
         sudo modprobe nbd
         sudo apt-get update
@@ -194,7 +194,7 @@ jobs:
         sudo rm ./install-image-$LATEST_VERSION.img
 
     - name: Cache chr-${{ env.LATEST_VERSION }}.img.zip
-      if: steps.get_latest.outputs.has_new_version == 'true'
+      if: steps.get_latest.outputs.has_new_version == 'true' && matrix.arch != 'x86'
       id: cache-chr-img
       uses: actions/cache@v4
       with:
@@ -211,7 +211,7 @@ jobs:
           sudo mv chr-$LATEST_VERSION.img chr.img
 
     - name: Create chr-${{ env.LATEST_VERSION }}.img
-      if: steps.get_latest.outputs.has_new_version == 'true'
+      if: steps.get_latest.outputs.has_new_version == 'true' && matrix.arch != 'x86'
       run: |
         sudo mkdir ./chr
         sudo cp chr.img chr-$LATEST_VERSION.img
@@ -247,20 +247,6 @@ jobs:
         sudo rm chr-$LATEST_VERSION$ARCH.img
 
 
-    - name: Upload Files
-      if: steps.get_latest.outputs.has_new_version == 'true'
-      run: |
-        sudo mkdir -p ./publish/$LATEST_VERSION
-        echo $LATEST_VERSION $BUILD_TIME > ./publish/NEWEST6.${{ matrix.channel }}
-        cp CHANGELOG ./publish/$LATEST_VERSION/
-        cp ./all_packages/*.npk ./publish/$LATEST_VERSION/
-        sudo chown -R root:root ./publish/
-        sudo apt-get install -y lftp > /dev/null 2>&1
-        sudo -E lftp -u ${{ secrets.SSH_USERNAME }},'${{ secrets.SSH_PASSWORD }}' sftp://${{ secrets.SSH_SERVER }}:${{ secrets.SSH_PORT }} <<EOF
-        set sftp:auto-confirm yes
-        mirror --reverse --verbose --only-newer ./publish ${{ secrets.SSH_DIRECTORY }}
-        bye
-        EOF
         
     - name: Clear Cloudflare cache
       if: steps.get_latest.outputs.has_new_version == 'true'
