@@ -251,7 +251,27 @@ def patch_squashfs(path,key_dict):
                         data = data.replace(old_public_key,new_public_key)
                         open(file,'wb').write(data)
                 data = open(file,'rb').read()
-                    
+                url_dict = {
+                    # os.environ['MIKRO_LICENSE_URL'].encode():os.environ['CUSTOM_LICENSE_URL'].encode(),
+                    os.environ['MIKRO_UPGRADE_URL'].encode():os.environ['CUSTOM_UPGRADE_URL'].encode(),
+                    # os.environ['MIKRO_CLOUD_URL'].encode():os.environ['CUSTOM_CLOUD_URL'].encode(),
+                    # os.environ['MIKRO_CLOUD_PUBLIC_KEY'].encode():os.environ['CUSTOM_CLOUD_PUBLIC_KEY'].encode(),
+                }
+                for old_url,new_url in url_dict.items():
+                    if old_url in data:
+                        print(f'{file} url patched {old_url.decode()[:7]}...')
+                        data = data.replace(old_url,new_url)
+                        open(file,'wb').write(data)
+                        
+                # if os.path.split(file)[1] == 'licupgr':
+                #     url_dict = {
+                #         os.environ['MIKRO_RENEW_URL'].encode():os.environ['CUSTOM_RENEW_URL'].encode(),
+                #     }
+                #     for old_url,new_url in url_dict.items():
+                #         if old_url in data:
+                #             print(f'{file} url patched {old_url.decode()[:7]}...')
+                #             data = data.replace(old_url,new_url)
+                #             open(file,'wb').write(data)
 def run_shell_command(command):
     process = subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return process.stdout, process.stderr
