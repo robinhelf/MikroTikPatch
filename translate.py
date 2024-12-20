@@ -55,5 +55,6 @@ def main(input_file, output_file):
             f.write("This is a Patched Version of routerOS.For Educational Purpose Only\n\n Refer to https://github.com/fujr/MikroTikPatch\n\n" + translated_text + '\n\n' + english_text)
 
 if __name__ == "__main__":
-    input_file = sys.argv[1]
-    main(input_file, input_file)
+    input = sys.argv[1]
+    output = sys.argv[2]
+    main(input, output)
