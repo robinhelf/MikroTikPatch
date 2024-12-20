@@ -79,7 +79,7 @@ jobs:
           if [ "${{ inputs.all_arch }}" == "true" ]; then
             echo "ARCH_MATRIX=[\"x86\", \"arm\", \"arm64\", \"mmips\", \"smips\", \"mipsbe\"]" >> $GITHUB_OUTPUT
           else
-            echo "ARCH_MATRIX=[\"${{ inputs.custom_channel }}\"]" >> $GITHUB_OUTPUT
+            echo "ARCH_MATRIX=[\"${{ inputs.custom_arch }}\"]" >> $GITHUB_OUTPUT
           fi
 
   PreparePatch:
