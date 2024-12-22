@@ -71,12 +71,12 @@ jobs:
       - name: Set up matrix
         id: set_matrix
         run: |
-          if [ "${{ inputs.latest }}" == "true" ]; then
+          if [ "${{ inputs.latest }}" != "false" ]; then
             echo "CHANNEL_MATRIX=[\"stable\", \"testing\"]" >> $GITHUB_OUTPUT
           else
             echo "CHANNEL_MATRIX=[\"${{ inputs.custom_channel }}\"]" >> $GITHUB_OUTPUT
           fi
-          if [ "${{ inputs.all_arch }}" == "true" ]; then
+          if [ "${{ inputs.all_arch }}" != "false" ]; then
             echo "ARCH_MATRIX=[\"x86\", \"arm\", \"arm64\", \"mmips\", \"smips\", \"mipsbe\"]" >> $GITHUB_OUTPUT
           else
             echo "ARCH_MATRIX=[\"${{ inputs.custom_arch }}\"]" >> $GITHUB_OUTPUT
@@ -102,7 +102,7 @@ jobs:
       - name: Get latest routeros version
         id: get_latest
         run: |
-          if [ "${{ inputs.latest }}" = "true" ]; then
+          if [ "${{ inputs.latest }}" != "false" ]; then
             LATEST_VERSION=$(wget -nv -O - https://upgrade.mikrotik.com/routeros/NEWESTa7.${{ matrix.channel }} | cut -d ' ' -f1)
             _LATEST_VERSION=$(wget -nv -O - https://${{ env.CUSTOM_UPGRADE_URL }}/routeros/NEWESTa7.${{ matrix.channel }} | cut -d ' ' -f1) || true
           else
@@ -548,7 +548,7 @@ jobs:
       if: steps.prepare_envs.outputs.IS_LATEST == 'true'
       run: |
         sudo mkdir -p ./routeros/$LATEST_VERSION
-        if [ "${{ inputs.latest }}" == "true" ];then
+        if [ "${{ inputs.latest }}" != "false" ];then
           echo $LATEST_VERSION $BUILD_TIME | sudo tee ./routeros/NEWESTa7.${{ matrix.channel }}
         fi
         sudo cp translation-${{ env.LATEST_VERSION }}-${{ matrix.channel }} ./routeros/$LATEST_VERSION/CHANGELOG

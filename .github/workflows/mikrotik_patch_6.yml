@@ -72,7 +72,7 @@ jobs:
       - name: Get latest routeros version
         id: get_latest
         run: |
-          if [ "${{ inputs.latest }}" = "true" ]; then
+          if [ "${{ inputs.latest }}" != "false" ]; then
             LATEST_VERSION=$(wget -nv -O - https://upgrade.mikrotik.com/routeros/NEWEST6.${{ matrix.channel }} | cut -d ' ' -f1)
             _LATEST_VERSION=$(wget -nv -O - https://${{ env.CUSTOM_UPGRADE_URL }}/routeros/NEWEST6.${{ matrix.channel }}  | cut -d ' ' -f1) || true
           else
@@ -343,7 +343,7 @@ jobs:
         if: steps.prepare_envs.outputs.IS_LATEST == 'true'
         run: |
             sudo mkdir -p ./routeros/$LATEST_VERSION
-            if [ "${{ inputs.latest }}" == "true" ];then
+            if [ "${{ inputs.latest }}" != "false" ];then
                 echo $LATEST_VERSION $BUILD_TIME | sudo tee ./routeros/NEWEST6.${{ matrix.channel }}
             fi
             sudo cp translation-${{ env.LATEST_VERSION }}-${{ matrix.channel }} ./routeros/$LATEST_VERSION/CHANGELOG
